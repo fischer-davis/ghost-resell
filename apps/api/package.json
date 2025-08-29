@@ -1,0 +1,23 @@
+{
+  "name": "api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "bun dist/index.js",
+    "dev": "bun src/index.ts",
+    "build": "bun build --target node src/index.ts --outdir ./dist",
+    "lint": "biome lint ."
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.0.1",
+    "@repo/auth": "workspace:*",
+    "@repo/db": "workspace:*",
+    "@repo/trpc": "workspace:*",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.3.3"
+  },
+  "devDependencies": {
+
+  }
+}

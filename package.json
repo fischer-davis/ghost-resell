@@ -1,0 +1,36 @@
+{
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo dev",
+    "lint": "turbo run format-and-lint",
+    "lint-fix": "turbo run format-and-lint:fix",
+    "db:seed": "turbo run db:seed --filter=@repo/db",
+    "format-and-lint": "ultracite lint",
+    "format-and-lint:fix": "ultracite format"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.2",
+    "@types/bun": "latest",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
+    "turbo": "^2.4.4",
+    "ultracite": "5.0.46"
+  },
+  "name": "with-vite-react",
+  "packageManager": "bun@1.2.5",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "react-day-picker": "^9.7.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,jsonc,css,scss,md,mdx}": [
+      "npx ultracite format"
+    ]
+  }
+}
