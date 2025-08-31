@@ -15,4 +15,5 @@ public/dist
 .idea
 drizzle
 db.sqlite
+.env.development
 upload
