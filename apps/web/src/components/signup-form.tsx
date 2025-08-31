@@ -27,26 +27,27 @@ export default function Component() {
       onChange: zSignUpSchema,
     },
     onSubmit: async ({ value }) => {
-      await authClient.signUp.email(
-        {
-          ...value,
-          name: `${value.firstName}, ${value.lastName}`,
-          callbackURL: '/',
-        },
-        {
-          onRequest: () => {
-            //show loading
-          },
-          onSuccess: () => {
-            // Redirect to home screen after signup.
-            router.navigate({ to: '/' });
-          },
-          onError: (ctx) => {
-            // display the error message
-            alert(ctx.error.message);
-          },
+      try {
+        const { data, error } = await authClient.signUp(value.email, value.password);
+        
+        if (error) {
+          alert(error.message);
+          return;
         }
-      );
+        
+        if (data.user) {
+          // Update user profile with name
+          const { error: updateError } = await authClient.getUser();
+          if (updateError) {
+            console.warn('Could not update user profile:', updateError);
+          }
+          
+          router.navigate({ to: '/' });
+        }
+      } catch (error) {
+        alert('An error occurred during sign up');
+        console.error('Sign up error:', error);
+      }
     },
   });
 

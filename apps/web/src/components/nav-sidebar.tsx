@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Key, Shield, User } from "lucide-react";
+import { Home, Shield, User } from "lucide-react";
 
 import {
   Sidebar,
@@ -29,12 +29,6 @@ const settingsNavItems = [
         icon: Shield,
         description: "Password and security settings",
       },
-      {
-        title: "API Keys",
-        href: "/settings/api-keys",
-        icon: Key,
-        description: "Manage your API keys",
-      },
     ],
   },
 ];
@@ -45,11 +39,6 @@ const tabs = [
     href: "/dashboard",
     icon: Home,
   },
-  {
-    title: 'API Keys',
-    href: "/api-keys",
-    icon: Key,
-  }
 ];
 
 export function NavSidebar() {

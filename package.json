@@ -15,6 +15,7 @@
     "@types/bun": "latest",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
+    "shadcn": "^3.0.0",
     "turbo": "^2.4.4",
     "ultracite": "5.0.46"
   },

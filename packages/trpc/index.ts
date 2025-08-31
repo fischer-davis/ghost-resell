@@ -1,8 +1,8 @@
-import { apiKeyRouter } from './routers/api-key';
+import { inventoryRouter } from './routers/inventory';
 import { createTRPCRouter, t } from './trpc';
 
 export const appRouter = createTRPCRouter({
-  apiKey: apiKeyRouter,
+  inventory: inventoryRouter,
 });
 
 /**

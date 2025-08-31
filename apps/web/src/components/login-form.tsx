@@ -23,24 +23,21 @@ export function LoginForm({
       onChange: zSignInSchema,
     },
     onSubmit: async ({ value }) => {
-      await authClient.signIn.email(
-        {
-          ...value,
-          callbackURL: '/',
-        },
-        {
-          onRequest: () => {
-            //show loading
-          },
-          onSuccess: () => {
-            router.navigate({ to: '/' });
-          },
-          onError: (ctx) => {
-            // display the error message
-            alert(ctx.error.message);
-          },
+      try {
+        const { data, error } = await authClient.signIn(value.email, value.password);
+        
+        if (error) {
+          alert(error.message);
+          return;
         }
-      );
+        
+        if (data.user) {
+          router.navigate({ to: '/' });
+        }
+      } catch (error) {
+        alert('An error occurred during sign in');
+        console.error('Sign in error:', error);
+      }
     },
   });
 

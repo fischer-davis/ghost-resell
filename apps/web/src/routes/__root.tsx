@@ -1,8 +1,8 @@
-import { authClient } from '@repo/auth/auth-client';
+import { supabase } from '@repo/auth/auth-client';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRoute, Outlet, useRouter } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavSidebar } from '@/components/nav-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
@@ -11,11 +11,35 @@ export const Route = createRootRoute({
 });
 
 function Root() {
-  const { data: session, isPending } = authClient.useSession();
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    if (isPending) {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    // Don't redirect if user is already on login/signup pages
+    if (window.location.pathname === '/signin' || window.location.pathname === '/signup') {
       return;
     }
 
@@ -24,7 +48,7 @@ function Root() {
     } else {
       router.navigate({ to: '/signin' });
     }
-  }, [isPending, session, router.navigate]);
+  }, [loading, session, router.navigate]);
 
   return (
     <>

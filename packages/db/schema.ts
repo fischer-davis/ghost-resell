@@ -1,112 +1,100 @@
-import { createId } from '@paralleldrive/cuid2';
 import { relations } from 'drizzle-orm';
 import {
+  decimal,
   integer,
-  sqliteTableCreator,
+  pgTable,
+  serial,
   text,
+  timestamp,
   unique,
-} from 'drizzle-orm/sqlite-core';
-
-export const createTable = sqliteTableCreator((name) => `ghost-drop_${name}`);
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 function createdAtField() {
-  return integer('created_at', { mode: 'timestamp' })
+  return timestamp('created_at')
     .notNull()
-    .$defaultFn(() => new Date());
+    .defaultNow();
 }
 
 function expiresAtField() {
-  return integer('expires_at', { mode: 'timestamp' });
+  return timestamp('expires_at');
 }
 
-export const user = createTable('user', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  email: text('email').notNull().unique(),
-  emailVerified: integer('email_verified', { mode: 'boolean' }).notNull(),
-  image: text('image'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
-  role: text('role', { enum: ['admin', 'user'] }).default('user'),
+
+
+
+// Storage location tracking
+export const shelves = pgTable('shelves', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 50 }).notNull(), // e.g., "Shelf 1", "Shelf A"
+  description: text('description'),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
-export const session = createTable('session', {
-  id: text('id').primaryKey(),
-  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-  token: text('token').notNull().unique(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
-  ipAddress: text('ip_address'),
-  userAgent: text('user_agent'),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+export const bins = pgTable('bins', {
+  id: serial('id').primaryKey(),
+  shelfId: integer('shelf_id').references(() => shelves.id),
+  name: varchar('name', { length: 50 }).notNull(), // e.g., "Bin A", "Bin 1"
+  description: text('description'),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
-export const account = createTable('account', {
-  id: text('id').primaryKey(),
-  accountId: text('account_id').notNull(),
-  providerId: text('provider_id').notNull(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  accessToken: text('access_token'),
-  refreshToken: text('refresh_token'),
-  idToken: text('id_token'),
-  accessTokenExpiresAt: integer('access_token_expires_at', {
-    mode: 'timestamp',
-  }),
-  refreshTokenExpiresAt: integer('refresh_token_expires_at', {
-    mode: 'timestamp',
-  }),
-  scope: text('scope'),
-  password: text('password'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+// Core inventory management
+export const items = pgTable('items', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  cost: decimal('cost', { precision: 10, scale: 2 }).notNull(),
+  listingPrice: decimal('listing_price', { precision: 10, scale: 2 }).notNull(),
+  category: varchar('category', { length: 100 }),
+  condition: varchar('condition', { length: 50 }), // New, Used, Refurbished, etc.
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const verification = createTable('verification', {
-  id: text('id').primaryKey(),
-  identifier: text('identifier').notNull(),
-  value: text('value').notNull(),
-  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }),
+// Individual inventory instances with location tracking
+export const inventoryInstances = pgTable('inventory_instances', {
+  id: serial('id').primaryKey(),
+  itemId: integer('item_id').references(() => items.id),
+  shelfId: integer('shelf_id').references(() => shelves.id),
+  binId: integer('bin_id').references(() => bins.id),
+  status: varchar('status', { length: 20 }).default('available'), // available, sold, reserved
+  soldPrice: decimal('sold_price', { precision: 10, scale: 2 }), // actual sale price
+  soldDate: timestamp('sold_date'),
+  platform: varchar('platform', { length: 50 }), // ebay, mercari, etsy, etc.
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
-export const apiKeys = createTable(
-  'apiKey',
-  {
-    id: text('id')
-      .notNull()
-      .primaryKey()
-      .$defaultFn(() => createId()),
-    name: text('name').notNull(),
-    createdAt: createdAtField(),
-    permissions: text('permissions').notNull().default('["read"]'),
-    keyId: text('keyId').notNull().unique(),
-    keyHash: text('keyHash').notNull(),
-    expiresAt: expiresAtField(),
-    usageCount: integer('usageCount').notNull().default(0),
-    userId: text('userId')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-  },
-  (ak) => ({
-    uniqueApiKey: unique().on(ak.name, ak.userId),
-  })
-);
-
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
+// Relations for inventory tables
+export const shelvesRelations = relations(shelves, ({ many }) => ({
+  bins: many(bins),
+  inventoryInstances: many(inventoryInstances),
 }));
 
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
+export const binsRelations = relations(bins, ({ one, many }) => ({
+  shelf: one(shelves, {
+    fields: [bins.shelfId],
+    references: [shelves.id],
+  }),
+  inventoryInstances: many(inventoryInstances),
+}));
+
+export const itemsRelations = relations(items, ({ many }) => ({
+  inventoryInstances: many(inventoryInstances),
+}));
+
+export const inventoryInstancesRelations = relations(inventoryInstances, ({ one }) => ({
+  item: one(items, {
+    fields: [inventoryInstances.itemId],
+    references: [items.id],
+  }),
+  shelf: one(shelves, {
+    fields: [inventoryInstances.shelfId],
+    references: [shelves.id],
+  }),
+  bin: one(bins, {
+    fields: [inventoryInstances.binId],
+    references: [bins.id],
   }),
 }));

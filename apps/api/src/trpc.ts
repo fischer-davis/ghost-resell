@@ -1,17 +1,15 @@
-import { auth } from '@repo/auth';
+import { verifySession } from '@repo/auth';
 import { type AppRouter, appRouter } from '@repo/trpc';
 import {
   type CreateFastifyContextOptions,
   type FastifyTRPCPluginOptions,
   fastifyTRPCPlugin,
 } from '@trpc/server/adapters/fastify';
-import { fromNodeHeaders } from 'better-auth/node';
 import type { FastifyInstance } from 'fastify';
 
 export async function createContext({ req }: CreateFastifyContextOptions) {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
+  const authHeader = req.headers.authorization;
+  const session = await verifySession(authHeader);
   return { session };
 }
 export type Context = Awaited<ReturnType<typeof createContext>>;

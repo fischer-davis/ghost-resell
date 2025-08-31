@@ -1,7 +1,7 @@
 // biome-ignore lint/performance/noNamespaceImport: ignore
 import * as process from 'node:process';
-import { type Client, createClient } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 // biome-ignore lint/performance/noNamespaceImport: ignore
 import * as schema from './schema';
 
@@ -10,14 +10,14 @@ import * as schema from './schema';
  * update.
  */
 const globalForDb = globalThis as unknown as {
-  client: Client | undefined;
+  client: postgres.Sql | undefined;
 };
 
-const databaseUrl = process.env.DATABASE_URL || 'file:../../packages/db/db.sqlite';
+const databaseUrl = process.env.DATABASE_URL || 'postgresql://localhost:5432/ghost-resell';
 
 export const client =
   globalForDb.client ??
-  createClient({ url: databaseUrl });
+  postgres(databaseUrl);
 if (process.env.NODE_ENV !== 'production') {
   globalForDb.client = client;
 }

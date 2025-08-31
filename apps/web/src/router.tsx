@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRouter as createTanStackRouter } from '@tanstack/react-router';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import type { AppRouter } from '@repo/trpc';
+import { supabase } from '@repo/auth/auth-client';
 import { useState } from 'react';
 import superjson from 'superjson';
 import { routeTree } from './routeTree.gen';
@@ -64,10 +65,17 @@ export function createRouter() {
               url: `${apiBaseUrl}/api/trpc`,
               transformer: superjson,
               maxURLLength: 14_000,
-              fetch(url, options) {
+              async fetch(url, options) {
+                const { data: { session } } = await supabase.auth.getSession();
                 return fetch(url, {
                   ...options,
                   credentials: 'include',
+                  headers: {
+                    ...options?.headers,
+                    ...(session?.access_token && {
+                      Authorization: `Bearer ${session.access_token}`,
+                    }),
+                  },
                 });
               },
             }),
