@@ -13,7 +13,8 @@ const globalForDb = globalThis as unknown as {
   client: postgres.Sql | undefined;
 };
 
-const databaseUrl = process.env.DATABASE_URL || 'postgresql://localhost:5432/ghost-resell';
+// Use connection pooling URL from Supabase
+const databaseUrl = process.env.DATABASE_URL || 'postgresql://postgres.rlrpwoojxkdxywedquvp:[YOUR-PASSWORD]@aws-0-us-east-2.pooler.supabase.com:6543/postgres';
 
 export const client =
   globalForDb.client ??

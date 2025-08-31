@@ -13,9 +13,6 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedPostsRouteImport } from './routes/_authenticated/posts'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedApiKeysRouteImport } from './routes/_authenticated/api-keys'
 import { Route as AuthenticatedSettingsProfileRouteImport } from './routes/_authenticated/settings/profile'
 import { Route as AuthenticatedSettingsApiKeysRouteImport } from './routes/_authenticated/settings/api-keys'
 
@@ -39,21 +36,6 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedPostsRoute = AuthenticatedPostsRouteImport.update({
-  id: '/_authenticated/posts',
-  path: '/posts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/_authenticated/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedApiKeysRoute = AuthenticatedApiKeysRouteImport.update({
-  id: '/_authenticated/api-keys',
-  path: '/api-keys',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedSettingsProfileRoute =
   AuthenticatedSettingsProfileRouteImport.update({
     id: '/profile',
@@ -71,9 +53,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
-  '/api-keys': typeof AuthenticatedApiKeysRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/posts': typeof AuthenticatedPostsRoute
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
@@ -82,9 +61,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
-  '/api-keys': typeof AuthenticatedApiKeysRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/posts': typeof AuthenticatedPostsRoute
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
@@ -94,9 +70,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
-  '/_authenticated/api-keys': typeof AuthenticatedApiKeysRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/posts': typeof AuthenticatedPostsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/settings/api-keys': typeof AuthenticatedSettingsApiKeysRoute
   '/_authenticated/settings/profile': typeof AuthenticatedSettingsProfileRoute
@@ -107,9 +80,6 @@ export interface FileRouteTypes {
     | '/'
     | '/signin'
     | '/signup'
-    | '/api-keys'
-    | '/dashboard'
-    | '/posts'
     | '/settings'
     | '/settings/api-keys'
     | '/settings/profile'
@@ -118,9 +88,6 @@ export interface FileRouteTypes {
     | '/'
     | '/signin'
     | '/signup'
-    | '/api-keys'
-    | '/dashboard'
-    | '/posts'
     | '/settings'
     | '/settings/api-keys'
     | '/settings/profile'
@@ -129,9 +96,6 @@ export interface FileRouteTypes {
     | '/'
     | '/signin'
     | '/signup'
-    | '/_authenticated/api-keys'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/posts'
     | '/_authenticated/settings'
     | '/_authenticated/settings/api-keys'
     | '/_authenticated/settings/profile'
@@ -141,9 +105,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
-  AuthenticatedApiKeysRoute: typeof AuthenticatedApiKeysRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedPostsRoute: typeof AuthenticatedPostsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
 }
 
@@ -175,27 +136,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/posts': {
-      id: '/_authenticated/posts'
-      path: '/posts'
-      fullPath: '/posts'
-      preLoaderRoute: typeof AuthenticatedPostsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/api-keys': {
-      id: '/_authenticated/api-keys'
-      path: '/api-keys'
-      fullPath: '/api-keys'
-      preLoaderRoute: typeof AuthenticatedApiKeysRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings/profile': {
@@ -234,9 +174,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
-  AuthenticatedApiKeysRoute: AuthenticatedApiKeysRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedPostsRoute: AuthenticatedPostsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
 }
 export const routeTree = rootRouteImport

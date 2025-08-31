@@ -53,6 +53,7 @@ export const inventoryRouter = router({
       binId: z.number(),
       category: z.string().optional(),
       condition: z.string().optional(),
+      platforms: z.array(z.string()).optional(),
     }))
     .mutation(async ({ input }) => {
       // Create the item
@@ -71,6 +72,7 @@ export const inventoryRouter = router({
         shelfId: input.shelfId,
         binId: input.binId,
         status: 'available' as const,
+        notes: input.platforms ? `Platforms: ${input.platforms.join(', ')}` : null,
       }));
 
       const instances = await db.insert(inventoryInstances).values(instancesData).returning();

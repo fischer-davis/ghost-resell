@@ -10,7 +10,8 @@
     "lint": "biome lint ."
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.8"
+    "@supabase/supabase-js": "^2.39.8",
+    "dotenv": "^17.2.1"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",
